@@ -1,8 +1,6 @@
-import 'dart:io' show Platform;
-
+import 'package:clima/utilities/current_location.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:location_permissions/location_permissions.dart';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -10,37 +8,19 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  void getLocation() async {
-    PermissionStatus permission =
-        await LocationPermissions().checkPermissionStatus();
-
-    if (permission == PermissionStatus.granted) {
-      Position position = await Geolocator().getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.bestForNavigation);
-
+  Future<void> getCurrenLocation() async {
+    try {
+      Position position = await Location().getCurrentLocation();
       print(position);
-    } else {
-      if (Platform.isAndroid) {
-        PermissionStatus getPermission =
-            await LocationPermissions().requestPermissions();
-
-        if (getPermission != null) {
-          getLocation();
-        }
-      } else if (Platform.isIOS) {
-        if (permission == PermissionStatus.restricted) {
-          print('Proceed to App');
-        } else {
-          print('Warn User and proceed');
-        }
-      }
+    } catch (e) {
+      print(e);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getCurrenLocation();
   }
 
   @override
