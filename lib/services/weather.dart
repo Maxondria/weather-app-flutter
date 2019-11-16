@@ -20,14 +20,18 @@ class WeatherModel {
 
       NetworkHelper networkHelper = NetworkHelper(url: url);
 
-      try {
-        http.Response response = await networkHelper.fetchData();
-        weather = Weather.fromJson(jsonDecode(response.body));
-      } catch (e) {
-        print('Internet Error: ${e.toString()}');
-      }
+      http.Response response = await networkHelper.fetchData();
+      weather = Weather.fromJson(jsonDecode(response.body));
     } catch (e) {
-      print('Location Error: ${e.toString()}');
+      print(e.cause);
+      weather = Weather(
+          temp: 0.0,
+          icon: 'Error',
+          description: 'Error',
+          city: '',
+          id: 0.0,
+          main: 0.0,
+          humidity: 'Error');
     }
     return weather;
   }
@@ -53,7 +57,9 @@ class WeatherModel {
   }
 
   String getMessage(int temp) {
-    if (temp > 25) {
+    if (temp <= 0) {
+      return 'Unable to get weather data';
+    } else if (temp > 25) {
       return 'It\'s 🍦 time';
     } else if (temp > 20) {
       return 'Time for shorts and 👕';

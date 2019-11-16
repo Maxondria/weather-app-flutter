@@ -1,29 +1,28 @@
 import 'dart:io' show Platform;
 
+import 'package:clima/services/exceptions.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location_permissions/location_permissions.dart';
 
 class Location {
   Future<Position> getCurrentLocation() async {
+    bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
+
+    if (!isLocationEnabled) {
+      throw CustomException(cause: 'LOCATION.DISABLED');
+    }
+
     PermissionStatus permission =
         await LocationPermissions().checkPermissionStatus();
 
     Position currentPosition;
 
     if (permission == PermissionStatus.granted) {
-      GeolocationStatus geolocationStatus =
-          await Geolocator().checkGeolocationPermissionStatus();
-
-      if (geolocationStatus == GeolocationStatus.disabled) {
-        print('Alert user to turn on, and re-run checks within method');
-        throw 'GPS.IS.OFF';
-      } else {
-        try {
-          currentPosition = await Geolocator().getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.bestForNavigation);
-        } catch (e) {
-          throw e.toString();
-        }
+      try {
+        currentPosition = await Geolocator().getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.bestForNavigation);
+      } catch (e) {
+        throw CustomException(cause: e);
       }
     } else {
       if (Platform.isAndroid) {
@@ -35,12 +34,13 @@ class Location {
         }
       } else if (Platform.isIOS) {
         if (permission == PermissionStatus.restricted) {
-          throw 'IOS.USER.RESTRICTED.LOCATION.USE';
+          throw CustomException(cause: 'IOS.USER.RESTRICTED.LOCATION.USE');
         } else {
-          throw 'IOS.USER.DENIED.LOCATION.PERMISSION';
+          throw CustomException(cause: 'IOS.USER.DENIED.LOCATION.PERMISSION');
         }
       }
     }
+
     return currentPosition;
   }
 }

@@ -14,6 +14,36 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   WeatherModel weatherModel = WeatherModel();
+  int temperature;
+  String icon;
+  String message;
+  String city;
+  Icon weatherIcon = Icon(
+    Icons.near_me,
+    size: 50.0,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+
+    Map<String, dynamic> weatherData = {
+      'temperature': widget.weather.temp.round(),
+      'icon': weatherModel.getWeatherIcon(widget.weather.id.toInt()),
+      'message': weatherModel.getMessage(widget.weather.temp.toInt()),
+      'city': widget.weather.city
+    };
+    updateState(weatherData);
+  }
+
+  void updateState(Map<String, dynamic> weather) {
+    setState(() {
+      temperature = weather['temperature'];
+      icon = weather['icon'];
+      message = weather['message'];
+      city = weather['city'];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +67,23 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   FlatButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      try {
+                        Weather weather = await weatherModel.getLocationData();
+
+                        Map<String, dynamic> weatherData = {
+                          'temperature': weather.temp.round(),
+                          'icon':
+                              weatherModel.getWeatherIcon(weather.id.toInt()),
+                          'message':
+                              weatherModel.getMessage(weather.temp.toInt()),
+                          'city': weather.city
+                        };
+                        updateState(weatherData);
+                      } catch (e) {
+                        print(e);
+                      }
+                    },
                     child: Icon(
                       Icons.near_me,
                       size: 50.0,
@@ -57,11 +103,11 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Row(
                   children: <Widget>[
                     Text(
-                      '${widget.weather.temp.round()}°',
+                      '$temperature°',
                       style: kTempTextStyle,
                     ),
                     Text(
-                      weatherModel.getWeatherIcon(widget.weather.id.toInt()),
+                      '$icon',
                       style: kConditionTextStyle,
                     ),
                   ],
@@ -70,7 +116,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  '${weatherModel.getMessage(widget.weather.temp.toInt())} in ${widget.weather.city}',
+                  '$message in $city',
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),

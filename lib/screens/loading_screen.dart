@@ -10,12 +10,9 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  String apiKey = '9860ad09fd0c5c0eacb90ea9114c5cdc';
-
   Future<void> getCurrenLocation() async {
     try {
-      WeatherModel weatherModel = WeatherModel();
-      Weather weather = await weatherModel.getLocationData();
+      Weather weather = await WeatherModel().getLocationData();
 
       Navigator.push(
         context,
