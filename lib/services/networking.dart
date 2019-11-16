@@ -1,25 +1,18 @@
-import 'dart:convert';
-
-import 'package:clima/models/weather_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class NetworkHelper {
-  final longitude;
-  final latitude;
-  String apiKey = '9860ad09fd0c5c0eacb90ea9114c5cdc';
+  final String url;
 
-  NetworkHelper({@required this.latitude, @required this.longitude});
+  NetworkHelper({@required this.url});
 
-  Future<Weather> fetchData() async {
-    Weather info;
+  Future<http.Response> fetchData() async {
+    http.Response info;
     try {
-      String url =
-          'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey';
       http.Response response = await http.get(url);
 
       if (response.statusCode == 200) {
-        info = Weather.fromJson(json.decode(response.body));
+        info = response;
       } else {
         print(response.statusCode);
       }
