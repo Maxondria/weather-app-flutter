@@ -36,6 +36,30 @@ class WeatherModel {
     return weather;
   }
 
+  Future<Weather> getCityWeather(String cityname) async {
+    String url = '$baseURL?q=$cityname&appid=$apiKey&units=metric';
+
+    Weather weather;
+
+    NetworkHelper networkHelper = NetworkHelper(url: url);
+
+    try {
+      http.Response response = await networkHelper.fetchData();
+      weather = Weather.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      print(e.cause);
+      weather = Weather(
+          temp: 0.0,
+          icon: 'Error',
+          description: 'Error',
+          city: '',
+          id: 0.0,
+          main: 0.0,
+          humidity: 'Error');
+    }
+    return weather;
+  }
+
   String getWeatherIcon(int condition) {
     if (condition < 300) {
       return '🌩';
