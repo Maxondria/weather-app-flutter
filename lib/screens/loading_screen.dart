@@ -15,19 +15,14 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  double latitude;
-  double longitude;
-
   String apiKey = '9860ad09fd0c5c0eacb90ea9114c5cdc';
 
   Future<void> getCurrenLocation() async {
     try {
       Position position = await Location().getCurrentLocation();
-      latitude = position.latitude;
-      longitude = position.longitude;
 
       String url =
-          'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey';
+          'https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&appid=$apiKey&units=metric';
 
       NetworkHelper networkHelper = NetworkHelper(url: url);
 
@@ -59,7 +54,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: SpinKitCircle(
+        child: SpinKitRipple(
           color: Colors.white,
           size: 100.0,
         ),
